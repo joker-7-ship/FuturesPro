@@ -1,0 +1,15 @@
+#下限价单
+put_limit=[{
+        "market":"BTCUSDT",
+        "side":1,
+        "amount":"0.001",
+        "price":"70000",
+        "source":"1",
+        "price_way":1,
+        "sl_price":"60000",
+        "tp_price":"130000",
+        "sl_type":2,
+        "tp_type":2,
+        "sl_limit_price":"60000",
+        "tp_limit_price":"130000"
+    }]
