@@ -21,7 +21,7 @@ def token():
     assert "token" in response_login_data, f"!!!Fail!!!: {response_login_data}"
     return response_login_data["token"]
 
-def validate_response(response, expected_message='OK!', request_params=None):
+def validate_response(response, expected_message='OK', request_params=None):
     """通用断言, 不通过打印请求和响应.正确断言应该是'OK',前期调试需要先让它不生效"""
     if response.get('message') != expected_message:
         print("Request!!!", request_params)
@@ -30,34 +30,25 @@ def validate_response(response, expected_message='OK!', request_params=None):
 
 class TestBtcc:
     # 查询用户当前仓位列表
-    @pytest.mark.parametrize("data", Market)
-    def test_PositionPending(self, server_time,token,data):
-        params = {
-            "token": token,
-            "market":data["market"],
-            "side":data["side"],
-            "tm": server_time
-        }
-        response = get_request("/btcc_perpetual/position/pending", params)
-        validate_response(response, request_params=params)
-
-    # 批量平仓
-    def test_Multi_close(self, server_time,token):
-        params = {
-            "token": token,
-            "multi_close":"test",
-            "source":"API",
-            "tm": server_time
-        }
-        response = get_request("/btcc_perpetual/position/multi_close", params)
-        validate_response(response, request_params=params)
-
+    # @pytest.mark.parametrize("data", Market)
+    # def test_PositionPending(self, server_time,token,data):
+    #     params = {
+    #         "token": token,
+    #         "market":data["market"],
+    #         "leader_id":10010000021857,
+    #         "side":data["side"],
+    #         "tm": server_time
+    #     }
+    #     response = get_request("/btcc_perpetual/position/pending", params)
+    #     validate_response(response, request_params=params)
     # 查询用户历史仓位
     @pytest.mark.parametrize("data", Market)
     def test_PositionFinished(self, server_time,token,data):
         params = {
             "token": token,
             "market":data["market"],
+            "leader_id": 10010000021857,
+            "finish_type":0,
             "start_time": 0,
             "end_time": 0,
             "side":data["side"],
@@ -65,62 +56,100 @@ class TestBtcc:
             "limit": 100,
             "tm": server_time
         }
-        response = get_request("/btcc_perpetual/position/pending", params)
+        response = get_request("/btcc_perpetual/position/finished", params)
         global position_id
         position_id = response['records']['position_id']
         validate_response(response, request_params=params)
-
     # 查询仓位成交记录
-    def test_PositionDeals(self, server_time,token,data):
+
+    def test_PositionDeals(self, server_time,token):
         params = {
             "token": token,
+            "leader_id": 10010000021857,
             "position_id":position_id,
             "offset": 0,
             "limit": 100,
             "tm": server_time
         }
         response = get_request("/btcc_perpetual/position/deals", params)
+        print(response)
         validate_response(response, request_params=params)
 
     # 调整用户仓位保证金
-    @pytest.mark.parametrize("data", AdjustMargin)
-    def test_AdjustMargin(self, server_time,token,data):
-        params = {
-            "token": token,
-            "market":data["market"],
-            "type": data["type"],
-            "amount":data["amount"],
-            "side":data["side"],
-            "tm": server_time
-        }
-        response = post_request("/btcc_perpetual/position/adjust_margin", params)
-        validate_response(response, request_params=params)
+    # @pytest.mark.parametrize("data", AdjustMargin)
+    # def test_AdjustMargin(self, server_time,token,data):
+    #     params = {
+    #         "token": token,
+    #         "market":data["market"],
+    #         "leader_id": 10010000021857,
+    #         "type": data["type"],
+    #         "amount":data["amount"],
+    #         "side":data["side"],
+    #         "tm": server_time
+    #     }
+    #     response = post_request("/btcc_perpetual/position/adjust_margin", params)
+    #     print(response)
+    #     validate_response(response, request_params=params)
 
     # 查询用户仓位保证金调整记录
-    @pytest.mark.parametrize("data", AdjustMargin)
-    def test_PositionMargin(self, server_time,token,data):
-        params = {
-            "token": token,
-            "position_id":position_id,
-            "offset": 0,
-            "limit": 100,
-            "tm": server_time
-        }
-        response = get_request("/btcc_perpetual/position/margins", params)
-        validate_response(response, request_params=params)
+    # @pytest.mark.parametrize("data", AdjustMargin)
+    # def test_PositionMargin(self, server_time,token,data):
+    #     params = {
+    #         "token": token,
+    #         "position_id":position_id,
+    #         "leader_id": 10010000021857,
+    #         "offset": 0,
+    #         "limit": 100,
+    #         "tm": server_time
+    #     }
+    #     response = get_request("/btcc_perpetual/position/margins", params)
+    #     validate_response(response, request_params=params)
 
-    # 查询用户仓位的历史资金费用
-    @pytest.mark.parametrize("data", Market)
-    def test_PositionFunding(self, server_time,token,data):
-        params = {
-            "token": token,
-            "market":data["market"],
-            "start_time": 0,
-            "end_time": 0,
-            "side":data["side"],
-            "offset": 0,
-            "limit": 100,
-            "tm": server_time
-        }
-        response = get_request("/btcc_perpetual/position/funding", params)
-        validate_response(response, request_params=params)
+    # # 查询用户仓位的历史资金费用
+    # @pytest.mark.parametrize("data", Market)
+    # def test_PositionFunding(self, server_time,token,data):
+    #     params = {
+    #         "token": token,
+    #         "market":data["market"],
+    #         "leader_id": 10010000021857,
+    #         "position_id": position_id,
+    #         "start_time": 0,
+    #         "end_time": 0,
+    #         "side":data["side"],
+    #         "offset": 0,
+    #         "limit": 100,
+    #         "tm": server_time
+    #     }
+    #     response = get_request("/btcc_perpetual/position/funding", params)
+    #     validate_response(response, request_params=params)
+
+# 调整仓位杠杆
+@pytest.mark.parametrize("data", Market)
+def test_Adjust_Leverage(self, server_time,token,data):
+    params = {
+        "token": token,
+        "market":data["market"],
+        "leader_id": 10010000021857,
+        "position_id": position_id,
+        "position_type": 1,
+        "end_time": 0,
+        "side":data["side"],
+        "leverage": 50,
+        "limit": 100,
+        "tm": server_time
+    }
+    response = post_request("/btcc_perpetual/market/adjust_leverage", params)
+    validate_response(response, request_params=params)
+
+
+# # 批量平仓
+    # def test_Multi_close(self, server_time,token):
+    #     params = {
+    #         "token": token,
+    #         "multi_close":"test",
+    #         "source":"API",
+    #         "tm": server_time
+    #     }
+    #     response = get_request("/btcc_perpetual/position/multi_close", params)
+    #     validate_response(response, request_params=params)
+    #

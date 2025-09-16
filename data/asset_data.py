@@ -4,7 +4,7 @@ History = [{
         "limit": 100 # 加注释
     },
 {
-        "asset": "BTC",
+        "asset": "BTCUSDT",
         "business": "trade",
         "start_time": 0.001,
         "end_time": 0.001,
@@ -14,7 +14,7 @@ History = [{
 ]
 
 market_preference= [{
-        "market":"BTC",
+        "market":"BTCUSDT",
         "side": 1
 },
 {
